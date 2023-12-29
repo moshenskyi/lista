@@ -92,6 +92,6 @@ The only prerequisite is to have `adb` installed. Usually, it's shipped with `An
 
 - If not, here is a guide on how to install it - [link](https://stackoverflow.com/a/32314718/7805359)
 
-You can just download, copy, or clone the code and run:
+You can just download, copy, or clone the code and one of the approaches would be to move this script to `/usr/local/bin/` folder.
 
-    ln -s list_activities /usr/local/bin/
+It's a user scripts folder that can be found in `$PATH`.
