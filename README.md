@@ -1,3 +1,4 @@
+
 # *lista* - CLI tool for activity listing
 
 Lists all activities for the app by specified package. If multiple devices are connected it **autocompletes** serial ID of all available devices
@@ -73,18 +74,24 @@ As you can see, less typing, more info
 
 ## Examples
 
-    # if only one device attached
+    # If only one device is attached
     lista -p "com.google.mail"
 
-    # if multiple devices are connected, add serial ID with the -s option. Autocompletable field
+    # If multiple devices are connected, add serial ID with the -s option. Autocompletable field
     lista -p "com.google.mail" -s 78f2ba2b
     
-    # help menu
+    # Help menu
     lista -h
 
 
 ## Installation
 
+The only prerequisite is to have `adb` installed. Usually, it's shipped with `Android Studio`
+
+- If you have `Android Studio` installed, you just need to add `adb`  to the `$PATH` variable ([guide](https://medium.com/macoclock/add-adb-to-path-on-osx-8bc2f11a19ea))
+
+- If not, here is a guide on how to install it - [link](https://stackoverflow.com/a/32314718/7805359)
+
 You can just download, copy, or clone the code and run:
 
-    ln -s list_activities.zsh /usr/local/bin/
+    ln -s list_activities /usr/local/bin/
