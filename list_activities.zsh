@@ -1,0 +1,112 @@
+#!/bin/zsh
+
+# Auto-completion function
+_lista() {
+    # Array variable storing the possible completions.
+    COMPREPLY=()
+
+    # Pointer to current & previous completion word
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local prev=${COMP_WORDS[COMP_CWORD - 1]}
+
+    if [[ ${cur} == -* ]]; then
+        COMPREPLY=($(compgen -W "-s -p -h" -- "$cur")) #   Generate the completion matches and load them into $COMPREPLY array.
+        return 0
+    fi
+
+    # Use the compgen for specific CLI options
+    case "$prev" in
+    -s) COMPREPLY=($(compgen -W "$(adb devices | awk '{if (NR > 1) print $1}')" -- "$cur")) ;;
+    esac
+
+    return 0
+}
+
+usage() {
+    cat <<EOF
+
+lista - CLI tool for activity listing
+
+Description: Lists all activities for app by specified package
+
+Usage: lista [options]
+  -s serial id - device serial ID. Should be used if more than one Android device connected to your machine.
+  -p package name (required unless -h is used). Example: -p "com.google.mail"
+  -h get help
+
+Examples:
+  lista -p "com.google.mail"
+  lista -p "com.google.mail" -s 78f2ba2b 
+  lista -h
+EOF
+}
+
+lista() {
+    cmd="adb "
+
+    local SERIAL_ID=""
+    local PACKAGE_NAME=""
+
+    while getopts ":hs:p:" opt_char; do
+        case $opt_char in
+        s) SERIAL_ID=$OPTARG ;;
+        p) PACKAGE_NAME=$OPTARG ;; # check by regex com.nike.omega.debug - reproducible by lista -ps
+        h)
+            usage
+            return 1
+            ;;
+        \?) # invalid option provided
+            echo "Invalid option provided\n"
+            echo "PACKAGE_NAME is required. Add -p argument"
+            usage
+            return 1
+            ;;
+        *)
+            usage
+            return 1
+            ;;
+        esac
+    done
+
+    shift $((OPTIND - 1))
+
+    _setSerialId $SERIAL_ID
+
+    if [ -z "$PACKAGE_NAME" ]; then
+        echo "PACKAGE_NAME is required. Add -p argument"
+        return 1
+    else
+        _setPackage $PACKAGE_NAME
+    fi
+
+    _showActivities $cmd
+}
+
+# Set serial id of device
+_setSerialId() {
+    if [ ! -z "$1" ]; then
+        echo "Serial ID: $1"
+        cmd+="-s $1 "
+    fi
+}
+
+# Set package name to look for
+_setPackage() {
+    echo "Package name: $PACKAGE_NAME\n"
+    cmd+="shell dumpsys activity activities | grep \"$PACKAGE_NAME\""
+}
+
+# Execute command and parse results
+_showActivities() {
+    local result=$(eval "$@" | grep Hist | awk -F '[{}]' '{print $2}' | cut -d ' ' -f3)
+
+    if [ -z $result ]; then
+        echo "No activities found\nCheck if app is runnung on your device or package name is correct"
+    else
+        echo "Activity stack:"
+        echo "$result"
+    fi
+}
+
+# Assign the auto-completion function
+complete -F _lista lista
