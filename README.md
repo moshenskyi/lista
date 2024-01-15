@@ -1,5 +1,5 @@
 
-# *lista* - CLI tool for activity listing
+# *lista* - CLI tool for viewing Activity stack
 
 Lists all activities for the app by specified package. If multiple devices are connected it **autocompletes** serial ID of all available devices
 
